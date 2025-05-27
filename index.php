@@ -1,33 +1,40 @@
 <?php
-// Get IP address of visitor
-$ip = $_SERVER['REMOTE_ADDR'];
+// List of common bots (can be expanded)
+$bots = [
+    'Googlebot',
+    'Bingbot',
+    'Slurp',
+    'DuckDuckBot',
+    'Baiduspider',
+    'YandexBot',
+    'Sogou',
+    'Exabot',
+    'facebot',
+    'ia_archiver'
+];
 
-// Use ip-api.com for geolocation (free for non-commercial use)
-$locationData = json_decode(file_get_contents("http://ip-api.com/json/{$ip}"), true);
+// Get the User-Agent string
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-if ($locationData && $locationData['status'] === 'success') {
-    $country = $locationData['countryCode'];
+// Flag to detect bot
+$isBot = false;
 
-    // Redirect based on country code
-    switch ($country) {
-        case 'US':
-            header("Location: https://us.example.com");
-            break;
-        case 'IN':
-            header("Location: https://in.example.com");
-            break;
-        case 'GB':
-            header("Location: https://uk.example.com");
-            break;
-        default:
-            header("Location: https://global.example.com");
-            break;
+// Check if User-Agent matches known bots
+foreach ($bots as $bot) {
+    if (stripos($userAgent, $bot) !== false) {
+        $isBot = true;
+        break;
     }
+}
 
-    exit(); // Always exit after redirection
+// Redirect based on type
+if ($isBot) {
+    // Redirect bots
+    header("Location: https://example.com/bot-page");
+    exit();
 } else {
-    // If geolocation fails, redirect to global
-    header("Location: https://global.example.com");
+    // Redirect real users
+    header("Location: https://example.com/user-page");
     exit();
 }
 ?>
